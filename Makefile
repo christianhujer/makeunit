@@ -1,23 +1,28 @@
+## Installation prefix.
 PREFIX:=/usr/local/
-INCDIR=$(PREFIX)include/
 
-## Installs makeunit on your system.
+## Installation directory for include files.
+INCDIR=$(PREFIX)/include/
+
 .PHONY: install
+## Installs makeunit on your system.
 install:
-	install -d $(INCDIR)makeunit/
-	install -t $(INCDIR)makeunit/ include/makeunit/*
+	install -d $(INCDIR)/makeunit/
+	install -t $(INCDIR)/makeunit/ include/makeunit/*
 
-## Removes makeunit from your system.
 .PHONY: uninstall
+## Removes makeunit from your system.
 uninstall:
-	$(RM) -r $(INCDIR)makeunit/
+	$(RM) -r $(INCDIR)/makeunit/
 
-## Runs the self-test.
 .PHONY: test
+## Runs the self-test.
 test:
 	$(MAKE) -C selftest/
 
-## Removes all auto-generated files.
 .PHONY: clean
+## Removes all auto-generated files.
 clean:
 	$(MAKE) -C selftest/ clean
+
+-include makehelp/Help.mak
