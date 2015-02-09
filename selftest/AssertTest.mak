@@ -1,36 +1,55 @@
 include makeunit/MakeUnit.mak
 
-.PHONY test: givenNonExistingFile_whenAssertingExistenceAndEmptiness_thenFails
-givenNonExistingFile_whenAssertingExistenceAndEmptiness_thenFails:
-	! $(MAKE) 'assertExistsAndIsEmpty(nonExistingFile)'
+define succeeds=
+.PHONY test: given_$(1)_when_$(2)_thenSucceeds
+given_$(1)_when_$(2)_thenSucceeds:
+	$(MAKE) '$(2)($(1))'
+	$(MAKE) -- '$(3)($(1))'
+endef
 
-.PHONY test: givenExistingEmptyFile_whenAssertingExistenceAndEmptiness_thenSucceeds
-givenExistingEmptyFile_whenAssertingExistenceAndEmptiness_thenSucceeds:
-	$(MAKE) 'assertExistsAndIsEmpty(existingEmptyFile)'
+define fails=
+.PHONY test: given_$(1)_when_$(2)_thenFails
+given_$(1)_when_$(2)_thenFails:
+	! $(MAKE) '$(2)($(1))'
+	! $(MAKE) -- '$(3)($(1))'
+endef
 
-.PHONY test: givenExistingNonEmptyFile_whenAssertingExistenceAndEmptiness_thenFails
-givenExistingNonEmptyFile_whenAssertingExistenceAndEmptiness_thenFails:
-	! $(MAKE) 'assertExistsAndIsEmpty(existingNonEmptyFile)'
+$(eval $(call fails,nonExisting,assertExists,-e))
+$(eval $(call succeeds,existingEmptyFile,assertExists,-e))
+$(eval $(call succeeds,existingNonEmptyFile,assertExists,-e))
+$(eval $(call succeeds,existingDirectory,assertExists,-e))
 
-.PHONY test: givenNonExistingFile_whenAssertingExistenceAndNonEmptiness_thenFails
-givenNonExistingFile_whenAssertingExistenceAndNonEmptiness_thenFails:
-	! $(MAKE) 'assertExistsAndIsNonEmpty(nonExistingFile)'
+$(eval $(call succeeds,nonExisting,assertIsEmpty,!-s))
+$(eval $(call succeeds,existingEmptyFile,assertIsEmpty,!-s))
+$(eval $(call fails,existingNonEmptyFile,assertIsEmpty,!-s))
+$(eval $(call fails,existingDirectory,assertIsEmpty,!-s))
 
-.PHONY test: givenExistingEmptyFile_whenAssertingExistenceAndNonEmptiness_thenFails
-givenExistingEmptyFile_whenAssertingExistenceAndNonEmptiness_thenFails:
-	! $(MAKE) 'assertExistsAndIsNonEmpty(existingEmptyFile)'
+$(eval $(call fails,nonExisting,assertExistsAndIsEmpty,-e&!-s))
+$(eval $(call succeeds,existingEmptyFile,assertExistsAndIsEmpty,-e&!-s))
+$(eval $(call fails,existingNonEmptyFile,assertExistsAndIsEmpty,-e&!-s))
+$(eval $(call fails,existingDirectory,assertExistsAndIsEmpty,-e&!-s))
 
-.PHONY test: givenExistingNonEmptyFile_whenAssertingExistenceAndNonEmptiness_thenSucceeds
-givenExistingNonEmptyFile_whenAssertingExistenceAndNonEmptiness_thenSucceeds:
-	$(MAKE) 'assertExistsAndIsNonEmpty(existingNonEmptyFile)'
+$(eval $(call fails,nonExisting,assertExistsAndIsNonEmpty,-s))
+$(eval $(call fails,existingEmptyFile,assertExistsAndIsNonEmpty,-s))
+$(eval $(call succeeds,existingNonEmptyFile,assertExistsAndIsNonEmpty,-s))
+$(eval $(call succeeds,existingDirectory,assertExistsAndIsNonEmpty,-s))
 
-nonExistingFile: ;
+$(eval $(call fails,nonExisting,assertIsDirectory,-d))
+$(eval $(call fails,existingEmptyFile,assertIsDirectory,-d))
+$(eval $(call fails,existingNonEmptyFile,assertIsDirectory,-d))
+$(eval $(call succeeds,existingDirectory,assertIsDirectory,-d))
+
+
+nonExisting: ;
 
 existingEmptyFile:
 	touch $@
 
 existingNonEmptyFile:
 	echo foo >$@
+
+existingDirectory:
+	mkdir -p $@
 
 .PHONY: clean
 clean: cleanAssertTest
