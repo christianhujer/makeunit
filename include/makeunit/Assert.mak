@@ -1,4 +1,4 @@
-ifeq (,$(MUNITASSERT.MAK))
+ifeq (undefined,$(origin MUNITASSERT.MAK))
 MUNITASSERT.MAK=$(lastword $(MAKEFILE_LIST))
 
 ## Asserts that % exists.

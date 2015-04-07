@@ -1,4 +1,4 @@
-ifeq (,$(MAKEUNIT/MAKEUNIT.MAK))
+ifeq (undefined,$(origin MAKEUNIT/MAKEUNIT.MAK))
 MAKEUNIT/MAKEUNIT.MAK:=$(lastword $(MAKEFILE_LIST))
 
 export SHELL:=bash
