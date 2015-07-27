@@ -35,13 +35,13 @@ givenExistingFileNonEmptyFile_whenGreppingForDot_thenSucceeds: data/existingNonE
 givenExistingEmptyFile_whenGreepingForDot_thenFails: data/existingEmptyFile
 	! grep . $^
 
-data/existingNonEmptyFile: | data
+data/existingNonEmptyFile: | data/
 	echo foo >$@
 
-data/existingEmptyFile: | data
+data/existingEmptyFile: | data/
 	touch $@
 
-data:
+data/:
 	mkdir -p $@
 
 .PHONY: clean
@@ -49,7 +49,7 @@ clean: cleanData
 
 .PHONY: cleanData
 cleanData:
-	$(RM) -r data
+	$(RM) -r data/
 ~~~~
 
 ### Assertions
@@ -73,11 +73,11 @@ It tests that when calling `./test.sh`, `stderr` and `stdout` are empty and `tes
 ~~~~
 NEG?=
 
-actual:
+actual/:
 	mkdir -p $@
 
 .PRECIOUS: actual/%.stdout actual/%.stderr
-actual/%.stdout actual/%.stderr: ./test.sh | actual
+actual/%.stdout actual/%.stderr: ./test.sh | actual/
 	$(NEG) ./%^ $(OPTIONS) >actual/$*.stdout 2>actual/$*.stderr
 
 test .PHONY: createsTestFile
